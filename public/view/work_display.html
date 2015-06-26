@@ -1,0 +1,30 @@
+<div id="work-display">
+	{{#each apps}}
+		<article id="apps-{{@index}}" class="project">
+			<h3>{{displayTitle}}</h3>
+			<p class="project-when">{{when}}</p>
+			<p class="project-about">{{about}}</p>
+			<ul class="project-tools">
+				{{#each tools}}
+				<li>{{this}}</li>
+				{{/each}}
+			</ul>
+			<a class="project-href" target="_blank" href="{{href}}">See Live</a>
+			<img class="project-img" src="img/{{img}}" alt="">
+		</article>
+	{{/each}}
+	{{#each wordpress}}
+		<article id="wordpress-{{@index}}" class="project">
+			<h3>{{displayTitle}}</h3>
+			<p class="project-when">{{when}}</p>
+			<p class="project-about">{{about}}</p>
+			<ul class="project-tools">
+				{{#each tools}}
+				<li>{{this}}</li>
+				{{/each}}
+			</ul>
+			<a class="project-href" target="_blank" href="{{href}}">See Live</a>
+			<img class="project-img" src="img/{{img}}" alt="">
+		</article>
+	{{/each}}
+</div>

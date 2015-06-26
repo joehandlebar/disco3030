@@ -1,0 +1,19 @@
+<div id="work">
+	<h1>Work</h1>
+	<div>
+		<h2>Apps</h2>
+		<ul>
+		{{#each apps}}
+		<li data-cat="apps" data-key="{{@index}}">{{menuTitle}}</li>
+		{{/each}}
+		</ul>
+	</div>
+	<div>
+		<h2>Wordpress</h2>
+		<ul>
+		{{#each wordpress}}
+			<li data-cat="wordpress" data-key="{{@index}}">{{menuTitle}}</li>
+		{{/each}}
+		</ul>
+	</div>
+</div>

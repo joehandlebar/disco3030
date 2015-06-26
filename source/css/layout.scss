@@ -1,0 +1,26 @@
+@import url(http://fonts.googleapis.com/css?family=Dosis:400,500,600,800);
+@import url(http://fonts.googleapis.com/css?family=Abel);
+
+/* colors */
+$yellow: #ff3;
+
+body {
+  background: #112;
+  margin-left: 4em;
+  margin-right: 4em;
+}
+
+a {
+	text-decoration: none;
+}
+
+ul {
+	list-style: none;
+	padding-left: 0;
+}
+
+#canvas {
+	position: fixed;
+	left: 0;
+	top: 0;
+}

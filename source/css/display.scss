@@ -1,0 +1,14 @@
+#display {
+	width: 60%;
+	position: absolute;
+	right: 5%;
+	top: 22%;
+
+	> div {
+		display: none;
+
+		&.display-selected {
+			display: block;
+		}
+	}
+}

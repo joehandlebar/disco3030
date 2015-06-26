@@ -1,0 +1,24 @@
+{
+  "name": "Disco3030",
+  "version": "1.0.0",
+  "description": "Suk's homepage",
+  "main": "index.js",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-concat": "*",
+    "gulp-jshint": "^1.11.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-sass": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "^3.0.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Suk",
+  "license": "ISC",
+  "dependencies": {
+    "gulp-connect": "^2.2.0",
+    "gulp-wrap": "^0.11.0"
+  }
+}

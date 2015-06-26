@@ -1,0 +1,69 @@
+{
+	"wordpress": [
+		{
+			"menuTitle": "Bauer",
+			"displayTitle": "Bauer - The First Shift",
+			"when": "Fall 2014",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["HTML5", "CSS3", "Responsive", "jQuery"],
+			"href": "http://www.thefirstshift.ca",
+			"img": "bauer.png"
+		},
+		{
+			"menuTitle": "BAPR",
+			"displayTitle": "Barrie Area Physician Recruitment",
+			"when": "Fall 2014",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["HTML5", "CSS3", "Responsive", "jQuery", "PHP"],
+			"href": "http://www.barriedoctors.ca/",
+			"img": "bapr.png"
+		},
+		{
+			"menuTitle": "Hardwood Ski and Bike",
+			"displayTitle": "Hardwood Ski and Bike - Winter",
+			"when": "Winter 2014",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["HTML5", "CSS3", "Responsive", "jQuery", "SVG"],
+			"href": "http://www.hardwoodskiandbike.ca/home-page-winter/",
+			"img": "hardwood.png"
+		},
+		{
+			"menuTitle": "Flags Unlimited",
+			"displayTitle": "Flags Unlimited",
+			"when": "Fall 2014",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["HTML5", "CSS3", "Responsive", "jQuery"],
+			"href": "http://www.hardwoodskiandbike.ca/home-page-winter/",
+			"img": "flags.png"
+		}
+	],
+	"apps": [
+		{
+			"menuTitle": "Tundra",
+			"displayTitle": "Tundra",
+			"when": "Summer 2015",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["React", "Firebase", "Sass", "Responsive"],
+			"href": "",
+			"img": "tundra.png"
+		},
+		{
+			"menuTitle": "MEAN Mountains",
+			"displayTitle": "MEAN Mountains",
+			"when": "Summer 2015",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["Angular", "Mongo", "Node", "Sass"],
+			"href": "",
+			"img": "mountains.png"
+		}, 
+		{
+			"menuTitle": "PosTodo",
+			"displayTitle": "PosTodo",
+			"when": "Summer 2015",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["Angular", "Firebase", "Sass"],
+			"href": "",
+			"img": "postodo.png"
+		}
+	]
+}

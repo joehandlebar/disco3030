@@ -1,0 +1,31 @@
+#work-display {
+	position: absolute;
+	left: 0%;
+	width: 50%;
+}
+
+.project {
+	font-family: 'Abel';
+	font-size: 0.8em;
+	display: block;
+	color: white;
+	display: none;
+
+	&-selected {
+		display: block;		
+	}
+
+	&-tools > li {
+		display: inline-block;
+		margin-right: 1em;
+	}
+
+	&-href {
+		display: block;		
+	}
+
+	&-img {
+		width: 80%;		
+		margin-top: 1em;
+	}
+}

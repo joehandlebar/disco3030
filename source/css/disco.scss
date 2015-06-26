@@ -1,0 +1,126 @@
+/* disco ball styles */
+#disco-ball {
+	font-size: 1em;
+
+	max-width: 25em;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 15%;
+	position: relative;
+
+	> h1 {
+		color: #fff;
+		font-family: "Dosis";
+		font-size: 7.8em;
+		font-weight: 600;
+
+		letter-spacing: -0.03em;
+		text-align: center;
+		line-height: 0.8;
+
+		position: absolute;
+		width: 100%;
+		top: 0em;
+		z-index: 5;
+	}
+
+	&.disco-init2 > h1 {
+		color: $yellow;
+		transition: color 1.5s;
+	}
+
+	&.disco-init3 {
+		margin-top: -50%;
+		transition: margin-top ease-out 0.5s;
+	}
+
+	&.disco-init4 {
+		transform: scale(0.4);
+		margin-right: 0;
+		margin-top: -6em;
+		transition: margin-top 1s;
+	}
+}
+
+.disco-row {
+  height: 1.5em;
+  text-align: center;
+}
+
+.cell {
+  /*border-radius: 30%;*/
+  border-radius: 50%;
+  display: inline-block;
+  background: white;
+  width: 0.9375em;
+  height: 0.0625em;
+  line-height: 0;
+  transition: height 0.1s;
+}
+
+.disco-init1 {
+  $leng: 7;
+    .disco-row .cell {
+		/*height: 1.375em;	*/
+		height: 1em;	
+    }
+
+    @for $i from 1 through $leng {
+      .disco-row:nth-of-type(#{$i}n) .cell {
+         transition: height 0.05s #{0.05 * $i}s;
+      }    
+    }
+}
+
+
+
+  
+@for $i from 1 through 14 {
+  $hue: 360 - ($i*26);
+  $color1: hsl($hue, 100%, 50%);
+  $color2: hsl($hue, 100%, 85%);
+  $color3: darken(#aaa, $i*2);
+
+  .disco-init1 .color {
+     &-#{$i} {
+      background: $color1;
+     }
+  }
+
+  .disco-init2 .color {
+    &-#{$i} {
+	  animation: shineOne#{$i} 0.3s #{$i*0.04}s forwards;
+    }
+  }
+
+  .disco-init4:hover .color {
+    &-#{$i} {
+	  animation: shineTwo#{$i} 0.3s 1 #{$i*0.04}s;
+    }
+  }
+
+	@keyframes shineOne#{$i} {
+	  50% {
+		background: $color2;
+		box-shadow: 0 0 0 0.125em $color2;
+	  }
+	  100% {
+		  background: $color3;
+		  opacity: 0.5;
+	  }
+	}
+
+	@keyframes shineTwo#{$i} {
+	  0% {
+		 background: $color3;
+		 opacity: 0.5;
+  	  }
+	  50% {
+		background: $color2;
+		box-shadow: 0 0 0 0.125em $color2;
+	  }
+	  100% {
+		  background: $color1;
+	  }
+	}
+}

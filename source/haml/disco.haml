@@ -1,0 +1,10 @@
+- nCells = [6, 10, 13, 16, 18, 19, 20, 20, 20, 19, 18, 16, 13, 10, 6]
+- index = 0
+#disco-ball
+  %h1= "DISCO 3030"
+  - nCells.each do |i|
+    .disco-row
+      - for j in 0...i
+        - index += 1
+        - cIndex = index % 14
+        .cell{:class => "color-#{cIndex}"}

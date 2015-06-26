@@ -1,0 +1,109 @@
+nav {
+	position: absolute;
+	top: 25%;
+
+	> ul {
+		padding-left: 0;
+	}
+
+	> ul > li {
+		line-height: 2;
+		opacity: 1;
+		transform: rotateY(0deg) rotateZ(0deg);
+		transform-origin: 0% 50%;
+		transition: opacity 0.2s;
+	}
+
+	a {
+		color: #fff;
+		font-family: 'Dosis';
+		font-weight: 400;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	&.nav-hidden > ul > li {
+		opacity: 0;
+		transform: rotateY(-60deg) rotateZ(30deg);
+	}
+
+	&.nav-loading > ul > li {
+		@for $i from 1 through 4 {
+			$delay: #{$i * 0.1}s;
+
+			&:nth-child(#{$i}) {
+				transition: transform 0.2s $delay, opacity 0.2s $delay;
+			}
+		}
+	}
+}
+
+#back {
+	background: white;
+	width: 2em;
+	height: 2em;
+	position: absolute;
+	top: 2em;
+	left: -3em;
+
+	&.back-hidden {
+		display: none;		
+	}
+
+	&:hover {
+		cursor: pointer;		
+	}
+
+	&:focus {
+		outline: none;		
+	}
+}
+
+.link {
+	&-hidden {
+		opacity: 0;
+		line-height: 0;
+		font-size: 0;
+		transition: opacity 0.2s, line-height 0.2s ease-out 0.2s,
+					font-size 0s 0.4s;
+
+	}
+
+	&-selected {
+		margin-top: -1em;
+
+		transition: margin-top 0.2s;
+
+		> a {
+			/*margin-left: 7em;*/
+			/*color: $yellow; */
+			/*font-size: 2em;		*/
+			/*opacity: 0;*/
+			
+			/*transition: font-size 0.2s, */
+						/*margin-left 0.3s 0.2s, */
+						/*opacity 0.3s 0.2s,*/
+						/*color 0.3s;*/
+			/*line-height: 0;*/
+			color: $yellow;
+			font-size: 4em;
+			opacity: 0;
+			transition: font-size 0.4s,
+						opacity 0.4s,
+						color 0.4s;
+
+			&:hover {
+				cursor: default;
+			}
+		}
+	}
+}
+
+#work-menu {
+	> li {
+		font-size: 1.1em;
+		display: inline-block;
+		margin-right: 1em;
+	}
+}
+

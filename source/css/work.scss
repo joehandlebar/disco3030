@@ -1,0 +1,18 @@
+#work {
+
+	> div {
+		margin-bottom: 3em;
+	}
+
+	h2 {
+		margin: 0;
+	}
+
+	li {
+		line-height: 1.5;
+
+		&:hover {
+			cursor: pointer;
+		}
+	}
+}
