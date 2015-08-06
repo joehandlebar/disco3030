@@ -1,0 +1,60 @@
+#contact {
+	position: absolute;
+	bottom: 2em;
+	z-index: 10;
+
+	> div {
+		margin-bottom: 1em;
+	}
+
+	i {
+		font-size: 1.2em;
+
+		margin-right: 0.5em;
+
+		&.fa-linkedin-square {
+			color: #1C77AD;		
+		}
+		
+		&.fa-twitter {
+			color: #339CF3; 		
+		}
+
+		&.fa-github {
+			color: #aaa;		
+		}
+
+		&.fa-codepen {
+			color: #fff;
+		}
+
+		&.fa-envelope {
+			font-size: 0.9em;
+			color: #f36633;
+		}
+
+		&.fa-mobile {	
+			color: $yellow;
+		}
+
+	}
+}
+
+
+.contact {
+	&-hidden > div {
+		opacity: 0;
+		transform: rotateY(-60deg) rotateZ(30deg);
+	}
+
+	&-loading > div {
+		@for $i from 1 through 3 {
+			$delay: #{$i * 0.05}s;
+
+			&:nth-child(#{$i}) {
+				transition: transform 0.2s $delay, 
+							opacity 0.2s $delay;
+			}
+		}
+	}
+}

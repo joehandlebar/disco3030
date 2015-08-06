@@ -2,13 +2,12 @@
 #disco-ball {
 	font-size: 1em;
 
-	max-width: 25em;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 15%;
-	position: relative;
+	left: 0;
+	right: 0;
+	top: 20%;
+	position: absolute;
 
-	> h1 {
+	 h1 {
 		color: #fff;
 		font-family: "Dosis";
 		font-size: 7.8em;
@@ -24,21 +23,32 @@
 		z-index: 5;
 	}
 
-	&.disco-init2 > h1 {
+	&.disco-hidden {
+		top: -50%;
+	}
+
+	&.disco-init2 h1 {
 		color: $yellow;
 		transition: color 1.5s;
 	}
 
 	&.disco-init3 {
-		margin-top: -50%;
-		transition: margin-top ease-out 0.5s;
+		top: -50%;
+		transition: top ease-out 0.5s;
 	}
 
 	&.disco-init4 {
-		transform: scale(0.4);
-		margin-right: 0;
-		margin-top: -6em;
-		transition: margin-top 1s;
+		top: 2%;
+
+		#disco-html {
+			display: none;		
+		}
+
+		#disco-png {
+			display: inline-block;
+		}
+
+		transition: top 0.5s;
 	}
 }
 
@@ -56,6 +66,19 @@
   height: 0.0625em;
   line-height: 0;
   transition: height 0.1s;
+}
+
+#disco-png {
+	display: none;
+	position: absolute;
+	right: 10%;
+}
+
+#disco-html {
+	width: 25em;
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .disco-init1 {
@@ -93,12 +116,6 @@
     }
   }
 
-  .disco-init4:hover .color {
-    &-#{$i} {
-	  animation: shineTwo#{$i} 0.3s 1 #{$i*0.04}s;
-    }
-  }
-
 	@keyframes shineOne#{$i} {
 	  50% {
 		background: $color2;
@@ -107,20 +124,6 @@
 	  100% {
 		  background: $color3;
 		  opacity: 0.5;
-	  }
-	}
-
-	@keyframes shineTwo#{$i} {
-	  0% {
-		 background: $color3;
-		 opacity: 0.5;
-  	  }
-	  50% {
-		background: $color2;
-		box-shadow: 0 0 0 0.125em $color2;
-	  }
-	  100% {
-		  background: $color1;
 	  }
 	}
 }

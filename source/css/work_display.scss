@@ -18,10 +18,111 @@
 	&-tools > li {
 		display: inline-block;
 		margin-right: 1em;
+
+		.sprite {
+			width: 40px;
+			height: 40px;
+		}
 	}
 
 	&-href {
-		display: block;		
+		$purp: #336;
+		$btnH: 1.4em;
+		$s: 1s;
+
+		display: inline-block;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 0.5em;
+		padding-right: 0.5em;
+		font-size: 1.3em;
+
+		> span {
+			background: $purp;
+			display: inline-block;
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+			
+			margin: 0;
+		}
+
+		$pd: 0.1em;
+		$dur: 0.8;
+		$leng: 5;
+
+		&-hover {
+
+			&-1 {
+				border-radius: 0.3em;
+				padding-left: 0.6em;		
+				padding-right: 0.6em;
+				letter-spacing: 0.1em;
+			}
+
+			&-2 {
+				padding-right: $pd;
+				transform: rotateX(-90deg) rotateY(-90deg);
+			}
+
+			&-3,
+			&-4 {	
+				padding-left: $pd;
+				padding-right: $pd;
+				transform: rotateX(-90deg) rotateY(-90deg);
+			}
+
+			&-5 {
+				border-top-right-radius: 0.3em;
+				border-bottom-right-radius: 0.3em;
+				padding-left: $pd;
+				padding-right: 0.6em;
+				transform: rotateX(-90deg) rotateY(-90deg);
+			}
+
+			@for $i from 1 through 5 {
+				&-#{$i} {
+					margin-left: #{($i - 1)*0.2}em;
+					transition: all #{$dur/$leng}s ease #{($i - 1)*($dur/(2*$leng))}s;
+				}		
+			}
+		}
+
+		&:hover .project-href-hover {
+			$purp2: #112;
+
+			&-1 {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+				background: $purp2;
+			} 		
+
+			&-2,
+			&-3,
+			&-4,
+			&-5 {	
+				margin-left: 0;
+				background: $purp2;
+				transform: rotateX(0deg) rotateY(0deg);
+			}
+		}
+
+		/*overflow: hidden;*/
+		/*width: 3.2em;*/
+		/*height: 1.5em;*/
+		/*position: relative;*/
+		/*transition: background 0.4s ease;*/
+
+
+
+		&:hover .project-href-normal {
+			/*height: 0;*/
+			transform: rotateX(-90deg);
+		}
+
+		&:hover .project-href-hover {
+			/*height: $btnH;*/
+			transform: rotateX(0deg);
+		}
 	}
 
 	&-img {

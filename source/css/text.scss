@@ -1,0 +1,29 @@
+.italic {
+	font-style: italic;
+}
+
+.block {
+
+	&-heading {
+		font-size: 1.6em;
+		font-family: 'Dosis';
+		font-weight: 400;
+		letter-spacing: 0.03em;
+		line-height: 1.5;
+
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	&-subheading {
+		margin-top: 0.3em;
+		margin-bottom: 0;
+		font-style: italic;
+	}
+
+	&-content {
+		margin-top: 0.8em;		
+		margin-bottom: 0;
+	}
+}
+

@@ -7,7 +7,7 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["HTML5", "CSS3", "Responsive", "jQuery"],
 			"href": "http://www.thefirstshift.ca",
-			"img": "bauer.png"
+			"img": "bauer"
 		},
 		{
 			"menuTitle": "BAPR",
@@ -16,7 +16,17 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["HTML5", "CSS3", "Responsive", "jQuery", "PHP"],
 			"href": "http://www.barriedoctors.ca/",
-			"img": "bapr.png"
+			"img": "bapr"
+		},
+		
+		{
+			"menuTitle": "Flags Unlimited",
+			"displayTitle": "Flags Unlimited",
+			"when": "Fall 2014",
+			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
+			"tools": ["HTML5", "CSS3", "Responsive", "jQuery"],
+			"href": "http://www.flagsunlimited.com/",
+			"img": "flags"
 		},
 		{
 			"menuTitle": "Hardwood Ski and Bike",
@@ -25,16 +35,7 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["HTML5", "CSS3", "Responsive", "jQuery", "SVG"],
 			"href": "http://www.hardwoodskiandbike.ca/home-page-winter/",
-			"img": "hardwood.png"
-		},
-		{
-			"menuTitle": "Flags Unlimited",
-			"displayTitle": "Flags Unlimited",
-			"when": "Fall 2014",
-			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
-			"tools": ["HTML5", "CSS3", "Responsive", "jQuery"],
-			"href": "http://www.hardwoodskiandbike.ca/home-page-winter/",
-			"img": "flags.png"
+			"img": "hardwood"
 		}
 	],
 	"apps": [
@@ -45,7 +46,7 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["React", "Firebase", "Sass", "Responsive"],
 			"href": "",
-			"img": "tundra.png"
+			"img": "tundra"
 		},
 		{
 			"menuTitle": "MEAN Mountains",
@@ -54,7 +55,7 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["Angular", "Mongo", "Node", "Sass"],
 			"href": "",
-			"img": "mountains.png"
+			"img": "mountains"
 		}, 
 		{
 			"menuTitle": "PosTodo",
@@ -63,7 +64,7 @@
 			"about": "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
 			"tools": ["Angular", "Firebase", "Sass"],
 			"href": "",
-			"img": "postodo.png"
+			"img": "postodo"
 		}
 	]
 }

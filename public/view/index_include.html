@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Disco3030</title>
+	<link rel="stylesheet" href="fontawesome/css/font-awesome.min.css"/>
+	<link rel="stylesheet" href="css/main.css"/>
+</head>
+<body>
+	@@include('disco.html')
+	@@include('nav.html')
+	<div id="content">
+		@@include('about.html')
+		@@include('resume.html')
+	</div>
+	<canvas id="canvas" width="900" height="900">
+	</canvas>
+	<canvas id="canvas2" width="900" height="900">
+	</canvas>
+	<div id="display">
+	</div>
+
+	@@include('contact.html')
+	
+	<div id="suk" class="sprite suk-hidden"></div>
+
+	<script src="js/prefixfree.min.js"></script>
+	<script src="js/zepto.min.js"></script>
+	<script src="js/handlebars.min.js"></script>
+	<script src="js/main.js"></script>
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+</body>
+</html>

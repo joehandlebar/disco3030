@@ -1,30 +1,46 @@
 <div id="work-display">
 	{{#each apps}}
 		<article id="apps-{{@index}}" class="project">
-			<h3>{{displayTitle}}</h3>
-			<p class="project-when">{{when}}</p>
-			<p class="project-about">{{about}}</p>
+			<h3 class="block-heading">{{displayTitle}}</h3>
+			<p class="block-subheading">{{when}}</p>
+			<p class="block-content">{{about}}</p>
 			<ul class="project-tools">
 				{{#each tools}}
-				<li>{{this}}</li>
+				<li>
+					{{#if href}}
+					<a target="_blank" title="more about {{name}}" href="{{href}}"><div class="sprite" style="background-position: {{x}}px {{y}}px"></div></a>
+					{{else}}
+<div class="sprite" style="background-position: {{x}}px {{y}}px"></div>
+					{{/if}}
 				{{/each}}
+				</li>
 			</ul>
-			<a class="project-href" target="_blank" href="{{href}}">See Live</a>
-			<img class="project-img" src="img/{{img}}" alt="">
+			<a target="_blank" class="project-href" href="{{href}}">
+				<span class="project-href-hover-1">See it</span><span class="project-href-hover-2">L</span><span class="project-href-hover-3">i</span><span class="project-href-hover-4">v</span><span class="project-href-hover-5">e !</span>
+			</a>
+			<div class="sprite project-img" style="background-position: {{img.x}}px {{img.y}}px; width: {{img.width}}px; height: {{img.height}}px"></div>
 		</article>
 	{{/each}}
 	{{#each wordpress}}
 		<article id="wordpress-{{@index}}" class="project">
-			<h3>{{displayTitle}}</h3>
-			<p class="project-when">{{when}}</p>
-			<p class="project-about">{{about}}</p>
+			<h3 class="block-heading">{{displayTitle}}</h3>
+			<p class="block-subheading">{{when}}</p>
+			<p class="block-content">{{about}}</p>
 			<ul class="project-tools">
 				{{#each tools}}
-				<li>{{this}}</li>
+				<li>
+					{{#if href}}
+						<a target="_blank" title="more about {{name}}" href="{{href}}"><div class="sprite" style="background-position: {{x}}px {{y}}px"></div></a>
+					{{else}}
+<div class="sprite" style="background-position: {{x}}px {{y}}px"></div>
+					{{/if}}
 				{{/each}}
+				</li>
 			</ul>
-			<a class="project-href" target="_blank" href="{{href}}">See Live</a>
-			<img class="project-img" src="img/{{img}}" alt="">
+			<a target="_blank" class="project-href" href="{{href}}">
+				<span class="project-href-hover-1">See it</span><span class="project-href-hover-2">L</span><span class="project-href-hover-3">i</span><span class="project-href-hover-4">v</span><span class="project-href-hover-5">e !</span>
+			</a>
+			<div class="sprite project-img" style="background-position: {{img.x}}px {{img.y}}px; width: {{img.width}}px; height: {{img.height}}px"></div>
 		</article>
 	{{/each}}
 </div>

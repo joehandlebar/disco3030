@@ -3,6 +3,7 @@
 
 /* colors */
 $yellow: #ff3;
+$yellow2: #ff6;
 
 body {
   background: #112;
@@ -11,6 +12,8 @@ body {
 }
 
 a {
+	color: #fff;
+	font-family: 'Dosis';
 	text-decoration: none;
 }
 
@@ -19,8 +22,35 @@ ul {
 	padding-left: 0;
 }
 
-#canvas {
+#canvas,
+#canvas2 {
 	position: fixed;
 	left: 0;
 	top: 0;
+	z-index: -20;
+}
+
+#canvas {
+	z-index: -20;
+}
+
+#canvas2 {
+	z-index: -10;
+}
+
+#suk {
+	position: absolute;
+	right: 0;
+	bottom: 0.5em;
+	z-index: 10;
+
+	transition: right 0.5s; 
+
+	&.suk-hidden {
+		right: -30em;		
+	}
+}
+
+.sprite {
+	background-image: url("../img/disco3030sprite.png");
 }

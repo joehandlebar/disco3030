@@ -15,47 +15,56 @@ nav {
 	}
 
 	a {
-		color: #fff;
-		font-family: 'Dosis';
 		font-weight: 400;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 	}
+}
 
-	&.nav-hidden > ul > li {
+.nav {
+	&-hidden > ul > li {
 		opacity: 0;
 		transform: rotateY(-60deg) rotateZ(30deg);
 	}
 
-	&.nav-loading > ul > li {
+	&-loading > ul > li {
 		@for $i from 1 through 4 {
-			$delay: #{$i * 0.1}s;
+			$delay: #{$i * 0.05}s;
 
 			&:nth-child(#{$i}) {
-				transition: transform 0.2s $delay, opacity 0.2s $delay;
+				transition: transform 0.2s $delay, 
+							opacity 0.2s $delay;
 			}
 		}
 	}
 }
 
 #back {
-	background: white;
-	width: 2em;
-	height: 2em;
-	position: absolute;
-	top: 2em;
-	left: -3em;
+	$l: 1em;
 
-	&.back-hidden {
-		display: none;		
-	}
+	background: transparent;
+	/*width: 2em;*/
+	/*height: 2em;*/
+
+	position: absolute;
+	top: 1.15em;
+	left: -2.1em;
+
+	border-top: $l solid transparent;
+	border-bottom: $l solid transparent;
+	border-right: $l solid white;
+
+	transition: all 0.2s;
 
 	&:hover {
 		cursor: pointer;		
+		border-right: 1.3em solid $yellow;
 	}
 
-	&:focus {
+    &:focus,	
+	&.back-hidden {
 		outline: none;		
+		border-right: 0em solid white;
 	}
 }
 
@@ -71,26 +80,13 @@ nav {
 
 	&-selected {
 		margin-top: -1em;
-
 		transition: margin-top 0.2s;
 
 		> a {
-			/*margin-left: 7em;*/
-			/*color: $yellow; */
-			/*font-size: 2em;		*/
-			/*opacity: 0;*/
-			
-			/*transition: font-size 0.2s, */
-						/*margin-left 0.3s 0.2s, */
-						/*opacity 0.3s 0.2s,*/
-						/*color 0.3s;*/
-			/*line-height: 0;*/
-			color: $yellow;
-			font-size: 4em;
+			font-size: 3em;
 			opacity: 0;
 			transition: font-size 0.4s,
-						opacity 0.4s,
-						color 0.4s;
+						opacity 0.4s;
 
 			&:hover {
 				cursor: default;

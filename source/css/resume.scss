@@ -1,0 +1,41 @@
+#resume {
+
+	h2 {
+		font-size: 1.8em;
+		line-height: 1;	
+		margin: 0;
+	}
+
+	.fa-university {
+		color: #ff9;
+	}
+
+	.fa-briefcase {
+		color: #552;
+	}
+}
+
+.resume {
+	&-profile {
+		margin-bottom: 2em;		
+
+		> span {
+			/*font-size: 1.6em;*/
+			color: $yellow2;
+		}
+	}
+
+	&-col {
+		display: inline-block;
+		width: 43%;
+		margin-right: 6.5%;
+		vertical-align: top;
+
+		font-size: 0.8em;
+
+		ul > li {
+			margin-bottom: 2em;		
+		}
+	}
+}
+
