@@ -1,0 +1,110 @@
+#resume-display {
+	padding-left: 5em;
+
+	h2 {
+		font-family: 'Dosis';
+		font-size: 1.2em;
+		font-weight: 400;
+	}
+
+	> div {
+		margin-bottom: 1.2em;
+		position: relative;
+	}
+
+	ul {
+		height: 2.4em;
+	}
+
+	ul > li {
+		position: absolute;
+		left: 0;
+		top: 2.5em;
+
+		display: inline-block;
+		transform: scale(0);
+		opacity: 0;
+
+		> a {
+			display: block;	
+		}
+	}
+}
+
+@mixin getWave($m) {
+	@keyframes wave#{$m} {
+	$top50: 0.9em; 
+	$top100: 2.55em; 
+	$left50: #{$m * 5/3}em;
+	$left100: #{$m * 2.5}em;
+
+
+		50% {  
+			top: $top50;	
+			left: $left50;
+		}
+		100% { 
+			top: $top100;	
+			left: $left100;
+			transform: scale(0.7);
+			opacity: 1;
+		}
+	}	
+}
+
+@keyframes waveHover {
+	50% {  
+		top: -1.0em;	
+	}
+	100% { 
+		top: 0em;	
+	}
+}	
+
+
+$l: 10;
+@for $k from 0 through $l {
+	@include getWave($k);
+}
+
+#resume-display.resume-init .resume-display {
+	$ls: 1, 3, 10, 2, 1;
+
+	@for $i from 0 through 4 {
+		$ln: nth($ls, $i+1);
+
+		/* wave into view */
+		&-#{$i} ul > li {
+	
+
+			@for $j from 0 through $ln {
+				&:nth-child(#{$j + 1}) {
+					$dur: 0.8s; 	
+					$del: #{(0.05 * $ln) 
+						  - (0.05 * $j) 
+						  + ($i * 0.15)}s;
+
+					animation: wave#{$j} $dur linear $del forwards; 
+
+				}
+			}
+
+		}		
+		
+	}
+}
+
+#resume-display.resume-loaded ul > li {
+	position: relative;
+	opacity: 1;
+	top: 0;
+	transform: scale(0.7);
+	transition: top 0.2s;
+
+	&:hover {
+		cursor: pointer;
+		top: -0.5em;
+	}
+
+}
+

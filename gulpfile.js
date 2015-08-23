@@ -45,6 +45,7 @@ gulp.task('styles', function() {
 					 pre + 'resume.scss',	
 					 pre + 'work.scss',	
 					 pre + 'work_display.scss',	
+					 pre + 'resume_display.scss',	
 					 pre + 'nav.scss'])
 			   .pipe(concat('main.css'))
 			   .pipe(sass())

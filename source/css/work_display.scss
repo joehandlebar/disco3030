@@ -5,19 +5,32 @@
 }
 
 .project {
+	$purp: #336;
+	$purp2: darken($purp, 10%);
+	$purp3: lighten($purp, 0%);
+
 	font-family: 'Abel';
 	font-size: 0.8em;
 	display: block;
 	color: white;
 	display: none;
+	max-width: 23em;
 
 	&-selected {
 		display: block;		
 	}
 
+	&-tools { 
+		margin: 3em 0 1em 0;
+	}
+
 	&-tools > li {
 		display: inline-block;
 		margin-right: 1em;
+
+		&:hover { 
+			animation: projectIconHover 0.5s linear 1;
+		}
 
 		.sprite {
 			width: 40px;
@@ -25,14 +38,30 @@
 		}
 	}
 
+	&-links { 
+		margin-top: 2em;
+		margin-bottom: 3em;
+
+		> a { 
+			display: inline-block;
+			margin-right: 1rem;	
+			vertical-align: middle;
+		}
+	}
+
+	&-github { 
+		margin-top: -0.1em;
+		font-size: 3.6em;	
+
+		&:hover { 
+			animation: projectIconHover 0.5s linear 1;
+		}
+	}
+
 	&-href {
-		$purp: #336;
 		$btnH: 1.4em;
 		$s: 1s;
 
-		display: inline-block;
-		margin-top: 1em;
-		margin-bottom: 1em;
 		padding-left: 0.5em;
 		padding-right: 0.5em;
 		font-size: 1.3em;
@@ -46,7 +75,7 @@
 			margin: 0;
 		}
 
-		$pd: 0.1em;
+		$pd: 0.05em;
 		$dur: 0.8;
 		$leng: 5;
 
@@ -56,7 +85,7 @@
 				border-radius: 0.3em;
 				padding-left: 0.6em;		
 				padding-right: 0.6em;
-				letter-spacing: 0.1em;
+				letter-spacing: 0.05em;
 			}
 
 			&-2 {
@@ -88,7 +117,6 @@
 		}
 
 		&:hover .project-href-hover {
-			$purp2: #112;
 
 			&-1 {
 				border-top-right-radius: 0;
@@ -105,13 +133,6 @@
 				transform: rotateX(0deg) rotateY(0deg);
 			}
 		}
-
-		/*overflow: hidden;*/
-		/*width: 3.2em;*/
-		/*height: 1.5em;*/
-		/*position: relative;*/
-		/*transition: background 0.4s ease;*/
-
 
 
 		&:hover .project-href-normal {
@@ -130,3 +151,28 @@
 		margin-top: 1em;
 	}
 }
+
+@keyframes projectIconHover { 
+	15% { 
+		transform: translateY(10%) scaleY(0.8) skewX(0deg);
+	}
+	30% { 
+		transform: translate(-5%, -8%) scaleY(1.05) skewX(5deg);
+	}
+	45% { 
+		transform: translateY(10%) scaleY(0.8) skewX(0deg);
+	}
+	60% { 
+		transform: translate(5%, -8%) scaleY(1.05) skewX(-5deg);
+	}
+	75% { 
+		transform: translateY(10%) scaleY(0.8) skewX(0deg);
+	}
+	90% { 
+		transform: scaleY(1) skewX(0deg);
+	}
+}
+
+
+
+

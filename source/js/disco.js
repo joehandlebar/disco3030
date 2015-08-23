@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Global utility for managing interface components 
  * knock-off of Backbone
@@ -24,7 +26,7 @@ Disco.router = function(routes, cb) {
 
 		hash = window.location.hash.slice(1);
 
-		if (routes[hash]) {
+		if (typeof routes[hash] !== "undefined") {
 			if (e) {
 				routes[hash](e);
 			}
@@ -43,10 +45,14 @@ Disco.router = function(routes, cb) {
 Disco.add = function(name, obj) {
 	var origRender, newRender;
 
+	//store component
 	this.components[name] = obj;
 
 	origRender = obj.render.bind(obj);
 
+	//complete the render function
+	//all render functions called once all components
+	//are set up
 	newRender = function() {
 		//call render w/ the right context
 		origRender();
@@ -60,7 +66,7 @@ Disco.add = function(name, obj) {
 }
 
 Disco.get = function(name) {
-	if (this.components[name]) {
+	if (typeof this.components[name] !== "undefined") {
 		return this.components[name];
 	}
 }

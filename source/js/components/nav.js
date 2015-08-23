@@ -23,16 +23,11 @@ Disco.add('nav', {
 	menuHidden: false,
 
 	render: function() {
-		var that = this.el;
+		var nav = this.el;
 
-		setTimeout(function() {
-			that.attr("class", "nav-loading");	
+		nav.attr("class", "nav-loading");	
 
-			//too much to have it load every time we go back to the menu
-			setTimeout(function() {
-				that.attr('class', '');
-			}, 500);
-		}, 0)
+		setTimeout(nav.attr.bind(nav, 'class', ''), 500);
 	},
 
 	showBackBtn: function() {
@@ -72,6 +67,7 @@ Disco.add('nav', {
 			else {
 				//enlarge selected link text
 				setTimeout(function() {
+					back.attr('class', '');
 
 					//select link
 					this.setAttribute('class', 'link-selected');

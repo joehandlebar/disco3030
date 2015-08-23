@@ -38,14 +38,15 @@
 	}
 
 	&.disco-init4 {
-		top: 2%;
+		top: -10%;
 
 		#disco-html {
-			display: none;		
+			margin-right: -5em;
+			transform: scale(0.4);
 		}
 
 		#disco-png {
-			display: inline-block;
+			/*display: inline-block;*/
 		}
 
 		transition: top 0.5s;
@@ -95,6 +96,17 @@
     }
 }
 
+/* already 'loaded' */
+#disco-ball.disco-solid { 
+	h1 { 
+		color: $yellow;
+	}
+
+	.disco-row .cell { 
+		height: 1em;
+	}
+}
+
 
 
   
@@ -113,6 +125,13 @@
   .disco-init2 .color {
     &-#{$i} {
 	  animation: shineOne#{$i} 0.3s #{$i*0.04}s forwards;
+    }
+  }
+
+  .disco-solid .color { 
+    &-#{$i} {
+	  background: $color3;
+	  opacity: 0.5;
     }
   }
 

@@ -1,8 +1,9 @@
 var loadInterface = function() {
-	var times;
+	var delays;
 
 	if (sessionStorage.getItem('visited')) {
-		times = [0,
+		delays = [0,
+				 0,
 				 0,
 				 0,
 				 0,
@@ -10,7 +11,8 @@ var loadInterface = function() {
 				 0];
 	}
 	else {
-		times = [0,
+		delays = [0,
+				 0,
 				 0,
 				 0,
 				 2200,
@@ -20,12 +22,13 @@ var loadInterface = function() {
 
 	Disco.render(['workMenu',
 				  'workDisplay',
+				  'resumeDisplay',
 				  'ball',
 				  'suk',
 				  'nav', 
 				  'contact'],
 
-				  times);
+				  delays);
 }
 
 var startDisco = function() {

@@ -37,7 +37,8 @@ Disco.add('ball', {
 		}
 
 		var init4 = function() {
-			el.addClass('disco-init4')
+			//el.addClass('disco-init4')
+			el.attr('class', 'disco-solid disco-init4')
 		}
 
 		//second visit and on gets partial disco treatment

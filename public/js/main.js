@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Global utility for managing interface components 
  * knock-off of Backbone
@@ -24,7 +26,7 @@ Disco.router = function(routes, cb) {
 
 		hash = window.location.hash.slice(1);
 
-		if (routes[hash]) {
+		if (typeof routes[hash] !== "undefined") {
 			if (e) {
 				routes[hash](e);
 			}
@@ -43,10 +45,14 @@ Disco.router = function(routes, cb) {
 Disco.add = function(name, obj) {
 	var origRender, newRender;
 
+	//store component
 	this.components[name] = obj;
 
 	origRender = obj.render.bind(obj);
 
+	//complete the render function
+	//all render functions called once all components
+	//are set up
 	newRender = function() {
 		//call render w/ the right context
 		origRender();
@@ -60,7 +66,7 @@ Disco.add = function(name, obj) {
 }
 
 Disco.get = function(name) {
-	if (this.components[name]) {
+	if (typeof this.components[name] !== "undefined") {
 		return this.components[name];
 	}
 }
@@ -244,9 +250,22 @@ var sprites = (function() {
 		return _sprites[img];
 	}
 
+	function applyImgToEl(img, $el) {
+		var d = _sprites[img];
+
+		if (typeof d.href !== "undefined") {
+			$el.attr("href", d.href);
+		}
+
+		$el.css({ 'background-position': d.x + 'px ' + d.y + 'px',
+					  'width': d.width,
+					  'height': d.height });
+	} 
+
 	return {
 		setSprites: setSprites,
-		getSprite: getSprite
+		getSprite: getSprite,
+		applyImgToEl: applyImgToEl
 	}
 
 })();
@@ -256,62 +275,51 @@ var templates = (function() {
 								  	 html: ''},
 					  'work_display':  { type: 'html',
 								  	     html: ''}
-					},
-		tmp;
+					};
+
+	return {
+		loadTemplates: loadTemplates,
+		compileTemplates: compileTemplates,
+		getTemplate: getTemplate
+	}
 
 
 	//takes a promise to fulfill once templates are loaded
 	function loadTemplates(promise) {
-		var leng = Object.keys(_templates).length, i = 0;
+		var leng = Object.keys(_templates).length, 
+			i = 0, 
+			tmp;
 
 		for (tmp in _templates) {
-			(function(tmp){
-				$.get('view/' + tmp + '.' + _templates[tmp].type, 
-					function(data) {
-						_templates[tmp].html = data;
+			_loadTemplate(tmp);
 
-						i++;
-
-						if (i === leng) {
-							promise.fulfill();
-						}
-					})
-			}(tmp))
 		}
+
+		function _loadTemplate(tmp) { 
+			var tmpObj = _templates[tmp],
+				path = 'view/' + tmp + '.' + tmpObj.type;
+
+			$.get(path, storeTemplate);
+
+			function storeTemplate(data) { 
+				tmpObj.html = data;
+
+				i++;
+				//all templates loaded? 
+				(i === leng) && promise.fulfill();
+			}
+		}
+
 	}
 
 	//compiles templates with given data
 	function compileTemplates(data) {
 		var menuTmp = Handlebars.compile(_templates['work_menu'].html),
-			displayTmp = Handlebars.compile(_templates['work_display'].html);
+			displayTmp = Handlebars.compile(_templates['work_display'].html, { noEscape: true });
 
 		//inject sprite data 
-		var sp;
-		data.apps.forEach(function(app) {
-			app.img = sprites.getSprite(app.img); 
-
-			app.tools = app.tools.map(function(tool) {
-				sp = sprites.getSprite(tool.toLowerCase());
-
-				//we shouldnt need this eventually
-				sp["name"] = tool;
-
-				return sp;	
-			})
-		});
-
-		data.wordpress.forEach(function(w) {
-			w.img = sprites.getSprite(w.img); 
-			
-			w.tools = w.tools.map(function(tool) {
-				sp = sprites.getSprite(tool.toLowerCase());
-
-				//we shouldnt need this eventually
-				sp["name"] = tool;
-
-				return sp;	
-			})
-		});
+		data.apps.forEach(_injectSpriteData);
+		data.wordpress.forEach(_injectSpriteData);
 
 		_templates['work_menu'].html = menuTmp({ 
 											apps: data.apps, 
@@ -324,16 +332,21 @@ var templates = (function() {
 											   }); 
 	}
 
-
 	function getTemplate(t) {
 		return _templates[t].html;
 	}
 
-	return {
-		loadTemplates: loadTemplates,
-		compileTemplates: compileTemplates,
-		getTemplate: getTemplate
+	/****/
+
+	function _injectSpriteData(project) { 
+		project.img = sprites.getSprite(project.img);
+
+		project.tools = project.tools.map(_getToolsSpriteData);
 	}
+
+	function _getToolsSpriteData(name) { 
+		return sprites.getSprite(name.toLowerCase());
+	} 
 })();
 
 var canvas = document.getElementById("canvas");
@@ -355,6 +368,10 @@ function getHex(base10) {
 
 //Each browser in the browser display has its own set of data
 var Browser = function(pts, colors) {
+	if (!(this instanceof Browser)) {
+		return new Browser(pts, colors);
+	}
+
 	//the original set of points
 	this.pts = pts;
 
@@ -367,27 +384,37 @@ var Browser = function(pts, colors) {
 	//copy this.pts to this.rotated
 	this.resetPts();
 
+	//radius of disc
+	this.r = 3;
 
 	//interval id
 	this.id = undefined;
 
 
 	//var img = new Image();
-
 	//img.src = src;
 	//img.onload = this.handleLoad.bind(this, img);
 }
 
 
-Browser.prototype = {
-	
-	resetPts: function() {
+Browser.prototype = (function() { 
+
+	return { 
+		resetPts: resetPts,
+		explode: explode,
+		blowUp: blowUp,
+ 		shrink: shrink,
+	    twirl: twirl,
+         stop: stop
+	}
+
+	function resetPts() {
 		var i, leng = this.pts.length;
 	
 		for ( i = 0 ; i < leng ; i++ ) {
 			this.rotated[i] = this.pts[i];
 		}
-	},
+	}
 
 	/*
 	 * used to extract data from raw img
@@ -444,270 +471,225 @@ Browser.prototype = {
 
 	//each browser's shrunken in the beginning so we 
 	//'blow up' the one we want to display
-	blowUp: function () {
-		var	leng = this.rotated.length/3,
-			pts = this.rotated,
-			colors = this.colors,
-			that = this,
-			
-			i, i3, 
-			x, y, z, 
-			grow = 1.2589,
-			a,
-			scale,
-			j = 0;
+	function blowUp() {
+		var positionPt,
+			fill, draw,
+			j = 0,
 
-		//this.id = setInterval(draw, 1000/this.frames);
-		ctx.fillStyle = "rgba(16, 16, 32, 0.8)"; 
+			//angle
+			a = Math.PI/120,
+			//scalar for growing size
+			s = 1.2589;
 
-		this.id = raf(draw);
+		positionPt = function(x, y, z, i3) { 
+				this.rotated[i3] =  (x * Math.cos(a)
+						   			+ z * -Math.sin(a)) * s;
 
-		function draw() {
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+				this.rotated[i3+1] = y * s;
 
+				this.rotated[i3+2] = (x * Math.sin(a) 
+									+ z * Math.cos(a)) * s;
 		
-			for ( i = 0; i < leng; i++ ) {
-				i3 = i*3;
-				x = pts[i3];
-				y = pts[i3+1];
-				z = pts[i3+2];
+		}.bind(this);
 
-				a = Math.PI/120; 
+		fill = _getFillFn(positionPt).bind(this);
 
-				pts[i3] =  (x * Math.cos(a)
-						   + z * -Math.sin(a)) * grow;
-
-				pts[i3+1] = y * grow;
-
-				pts[i3+2] = (x * Math.sin(a) 
-							+ z * Math.cos(a)) * grow;
-
-				scale = 1000/(pts[i3+2] + 1000); 
-
-				ctx.strokeStyle = colors[i];
-				ctx.beginPath();
-
-				ctx.arc(pts[i3]*scale + canvas.width/2.5,
-						pts[i3+1]*scale + canvas.height/2,
-						1, 0, Math.PI*2);
-
-				ctx.stroke();
-			}
-			
+		draw = function() { 
+			fill();	
 			j++;
-				
-			that.id = raf(draw);
+			this.id = raf(draw);
+			(j === 20) && (caf(this.id), this.twirl());
 
-			if (j === 20) {
-				caf(that.id);
-				that.twirl();	
-			}
-		}
-	},
-
-	twirl: function() {
-		var	leng = this.rotated.length/3,
-			pts = this.rotated,
-			colors = this.colors,
-			that = this,
-
-			i, i3, 
-			x, y, z, 
-			a,
-			scale,
-			j = 0;
+		}.bind(this);
 
 		ctx.fillStyle = "rgba(16, 16, 32, 0.8)"; 
-
+		this.r = 0.5;
 		this.id = raf(draw);
+	}
 
-		function draw() {
+	//twirl browser after blowing it up
+	function twirl() {
+		var positionPt, 
+			fill, draw,
+			j = 0,
 
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			//angle	
+			a;
 
+		positionPt = function(x, y, z, i3) { 
+
+			a = Math.PI/480 
+				+ (0.025 * (j/1000))
+				+ (0.0025 - 0.0025*Math.abs(y/180)) 
+				+ (0.0025 - 0.0025*Math.abs(x/180));
+
+
+			this.rotated[i3] =  x * Math.cos(a)
+					   			+ z * -Math.sin(a);
+						
+			this.rotated[i3+2] = x * Math.sin(a) 
+								 + z * Math.cos(a);
 		
-			for ( i = 0; i < leng; i++ ) {
-				i3 = i*3;
-				x = pts[i3];
-				y = pts[i3+1];
-				z = pts[i3+2];
+		}.bind(this);
 
-				a = Math.PI/480 
-					+ (0.025 * (j/1000))
-					+ (0.0025 - 0.0025*Math.abs(y/180)) 
-					+ (0.0025 - 0.0025*Math.abs(x/180));
+		fill = _getFillFn(positionPt).bind(this);
 
-
-				pts[i3] =  x * Math.cos(a)
-						   + z * -Math.sin(a);
-							
-				pts[i3+2] = x * Math.sin(a) 
-							+ z * Math.cos(a);
-
-				scale = 1000/(pts[i3+2] + 1000); 
-
-				ctx.strokeStyle = colors[i];
-				ctx.beginPath();
-
-				ctx.arc(pts[i3]*scale + canvas.width/2.5,
-						pts[i3+1]*scale + canvas.height/2,
-						3, 0, Math.PI*2);
-
-				ctx.stroke();
-			}
+		draw = function() { 
+			fill();
 
 			j = (j + 1) % 1000;
-			that.id = raf(draw);
-		}
-	},
+			this.id = raf(draw);
+
+		}.bind(this);
+
+		ctx.fillStyle = "rgba(16, 16, 32, 0.8)"; 
+		this.r = 3;
+		this.id = raf(draw);
+	}
 
 	//shrink current browser and blowup next one
-	shrink: function(next) {
-		var	leng = this.rotated.length/3,
-			pts = this.rotated,
-			colors = this.colors,
-			that = this,
+	function shrink(next) {
+		var positionPt, 
+			fill, draw,
 
-			i, i3, 
-			x, y, z,
 			a,
-			scale,
-			j = 0,
-		
 			//a chunk of the rotation angle
 			base = Math.PI/240, 
-		
 			//scalar for distance from origin to point
-			shrink = 1, 
-		
-			//radius for each circle
-			r = 3;
+			s = 1,
+			j = 0;
 
 
-		ctx.fillStyle = "rgba(16, 16, 32, 0.1)"; 
+		positionPt = function(x, y, z, i3) { 
+			a = base
+				+ (0.015 * (j/1000))
+				+ (0.0025 - 0.0025*Math.abs(y/180)) 
+				+ (0.0025 - 0.0025*Math.abs(x/180));
 
-		caf(this.id);
-		this.id = raf(draw);
+			this.rotated[i3] =  (x * Math.cos(a)
+					   + z * -Math.sin(a)) * s;
 
-		function draw() {
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			this.rotated[i3+1] = y * s;
 
-		
-			for ( i = 0; i < leng; i++ ) {
-				i3 = i*3;
-				x = pts[i3];
-				y = pts[i3+1];
-				z = pts[i3+2];
+			this.rotated[i3+2] = (x * Math.sin(a) 
+						+ z * Math.cos(a)) * s;
+		}.bind(this);
 
-				a = base
-					+ (0.015 * (j/1000))
-					+ (0.0025 - 0.0025*Math.abs(y/180)) 
-					+ (0.0025 - 0.0025*Math.abs(x/180));
+		fill = _getFillFn(positionPt).bind(this);
 
-				pts[i3] =  (x * Math.cos(a)
-						   + z * -Math.sin(a)) * shrink;
-
-				pts[i3+1] = y * shrink;
-
-				pts[i3+2] = (x * Math.sin(a) 
-							+ z * Math.cos(a)) * shrink;
-
-				scale = 1000/(pts[i3+2] + 1000); 
-
-				ctx.strokeStyle = colors[i];
-				ctx.beginPath();
-
-				ctx.arc(pts[i3]*scale + canvas.width/2.5,
-						pts[i3+1]*scale + canvas.height/2,
-						r, 0, Math.PI*2);
-
-				ctx.stroke();
-			}
+		draw = function() { 
+			fill();
 			
 			j++;
-
-			that.id = raf(draw);
+			this.id = raf(draw);
 
 			//smudge and shrink w/ faster spin
 			if (j === 60) {
 				ctx.fillStyle = "rgba(16, 16, 32, 0.8)"; 
-				shrink = 0.7943;
+				s = 0.7943;
 				base = Math.PI/60;
-				r = 1;
+				this.r = 1;
 			}
 
 			//on to the next one
 			if (j === 80) {
-				that.resetPts();
+				this.resetPts();
 				next.blowUp();
-				caf(that.id);
+				caf(this.id);
 			}
-		}
-	},
+		}.bind(this);
 
-	//blows up the browser to the right and ends the animation
-	explode: function() {
-
-		var	leng = this.rotated.length/3,
-			pts = this.rotated,
-			colors = this.colors,
-			that = this,
-
-			i, i3, 
-			x, y, z,
-		
-			originX = -600,
-			scale,
-			j = 0;
 
 		ctx.fillStyle = "rgba(16, 16, 32, 0.1)"; 
-
 		caf(this.id);
+		this.r = 3;
 		this.id = raf(draw);
+	}
 
-		function draw() {
-			ctx.fillRect(0, 0, canvas.width, canvas.height);		
+	//blows up the browser to the right and ends the animation
+	function explode() {
+		var positionPt, 
+			fill, draw,
+			j = 0,
+				
+			originX = -600;
 
-			for ( i = 0; i < leng; i++ ) {
-				i3 = i*3;
-				x = pts[i3];
-				y = pts[i3+1];
-				z = pts[i3+2];
+		positionPt = function(x, y, z, i3) { 
+			this.rotated[i3] = (x + (x - originX)/10) * 1.3;
+			this.rotated[i3+1] = (y + y/10) * 1.3;
+			this.rotated[i3+2] = 0;
+		}.bind(this);
 
-				pts[i3] = (x + (x - originX)/10) * 1.3;
-				pts[i3+1] = (y + y/10) * 1.3;
+		fill = _getFillFn(positionPt).bind(this);
 
-				pts[i3+2] = 0;
-
-				scale = 1000/(pts[i3+2] + 1000); 
-
-				ctx.strokeStyle = colors[i];
-				ctx.beginPath();
-
-
-				ctx.arc(pts[i3]*scale + canvas.width/2.5,
-						pts[i3+1]*scale + canvas.height/2,
-						3, 0, Math.PI*2);
-
-				ctx.stroke();
-			}
-			
+		draw = function() { 
+			fill();
 			j++;
-
-			that.id = raf(draw);
+			this.id = raf(draw);
 
 			if (j === 30) {
-				caf(that.id);
-				that.resetPts();
+				caf(this.id);
+				this.resetPts();
 			} 
-		} 
-	},
+		}.bind(this);
 
-	//ends the animation, suspending the last frame 
-	stop: function() {
+		ctx.fillStyle = "rgba(16, 16, 32, 0.1)"; 
+		caf(this.id);
+		this.id = raf(draw);
+	}
+
+	//pauses animation
+	function stop() {
 		caf(this.id);			  
 	}
-} 
+
+	/****/
+
+	function _drawPt(x, y, z, color, r) { 
+		var scale = 1000/(z + 1000);
+
+		ctx.strokeStyle = color;
+		ctx.beginPath();
+
+		ctx.arc(x*scale + canvas.width/2.5,
+				y*scale + canvas.height/2,
+				r, 0, Math.PI*2);
+
+		ctx.stroke();
+	}
+
+	function _getFillFn(pos) { 
+		var i, i3,
+			pts, leng, colors,
+			x, y, z;
+
+		return function() { 
+
+			pts = this.rotated;
+			leng = pts.length/3;
+			colors = this.colors;
+
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			for (i = 0 ; i < leng; i++) { 
+					i3 = i*3;
+					x = pts[i3];
+					y = pts[i3+1];
+					z = pts[i3+2];
+
+					pos(x, y, z, i3);
+
+				_drawPt(pts[i3], 
+						pts[i3+1], 
+						pts[i3+2], 
+						colors[i],
+						this.r);
+			}
+		}
+	} 
+})();
+
+	
 
 var Portrait = (function() {
 
@@ -729,30 +711,14 @@ var Portrait = (function() {
 		rX = canvas2.width/1.8,
 		rY = canvas2.height/3,
  
-		//for looping through data
-		i, j, k,
-
 		//image width and height
 		w, h,
-
-		//for grabbing a chunk of the image
-		x, y, w2, h2,
-
-		//for randomness
-		r, r2,
-
 		leng,
 
 		//colors: red, green, blue purple, yellow, teal, none
 		color = 'r',
-		colors = 'rgbpytn',
-		//alpha
-		a,
+		colors = 'rgbpytn';
 	
-		//time
-		t = 0,
-		time = 0;
-
 	//load image
 	var img = new Image();
 		img.src = 'img/portrait.jpg';
@@ -764,130 +730,25 @@ var Portrait = (function() {
 
 		hCtx.drawImage(img, 0, 0, hidden.width, hidden.height);
 
-		imgData = imgData2 = hCtx.getImageData(0, 0, hidden.width, hidden.height);
-		d = d2 = imgData.data,
+		//imgData = imgData2 = hCtx.getImageData(0, 0, hidden.width, hidden.height);
+		//d = d2 = imgData.data,
+
+		imgData = hCtx.getImageData(0, 0, hidden.width, hidden.height);
+		d = imgData.data;
 
 		w = imgData.width;
 		h = imgData.height;
 		leng = d.length;
 	}
 
-	/**
-	 * setup glitch  
-	 */
 
-		var id;
 
-		var filter = function(d, i) {
-
-			if (time % 5 === 0) {
-				return _isDarkerThan(_rand(50, 200))(d, i);
-			}
-			else if (time % 5 === 1) {
-				return _isRedderThan(_rand(100, 200))(d, i);
-			}
-			else if (time % 5 === 2) {
-				return _isLessRedThan(_rand(100, 200))(d, i);
-			} 
-			else if (time % 5 === 3) {
-				return _isLessBlueThan(_rand(100, 200))(d, i);
-			} 
-			else if (time % 5 === 4) {
-				return _isBrighterThan(_rand(100, 200))(d, i);
-			}
-			else {
-				return false;			
-			}
-
-		}
-
-		var color1 = function(d, i) {
-			if (Math.random() > 0.8) {
-				_alpha(100);
-			}
-			else {
-				_invert(d, i);
-			}
-		}
-		
-		var colorF = _getColoringF(filter, 
-								color1,
-								 _standardDark);
-
-		var render = function(d) {
-			bCtx.fillStyle = "rgba(16, 16, 32, 0.5)"; 
-			bCtx.fillRect(rX - 5, 
-							rY - 5, 
-							hidden.width * 1.1, 
-							hidden.height * 1.1);
-
-			var r = Math.random();
-
-			if (r > 0.7) {
-				_renderChunk(d);
-			}
-			else {
-				_renderShifted(d, h/_rand(10, 160), _rand(1, 5));
-			}
-
-			_resetData(d);
-
-			if (time === t*6) {
-				color = colors[  Math.round( Math.random()*(colors.length - 1) ) ];
-			}
-
-			time = (time + t) % 7*t;
-		}
-
-		var glitch = _getGlitch(_all, colorF, render);
-
-		var runGlitch = function() {
-			var r = Math.random();
-
-			glitch();
-
-			if (r > 0.1) {
-				id = setTimeout(runGlitch, t);
-			}
-			else {
-				id = setTimeout(unGlitch, t);
-			}
-
-		}
-
-		var unGlitch = function() {
-			var r = Math.random();
-
-			ctx2.clearRect(0, 0, 
-							canvas2.width, 
-							canvas2.height);
-
-			_renderOriginal();
-
-			if (r > 0.8) {
-				time = 0;
-				t = _rand(30, 150);
-
-				id = setTimeout(runGlitch, t);
-			}
-			else {
-				id = setTimeout(unGlitch, 300);
-			}
-		} 
-
-	/**
+	/*
+	 * Public API
 	 *
 	 */
 
-
-	return {
-		init: init,
-		stop: stop
-	}
-
-
 	function init() {
-		//we'll have something different later...
 		_renderOriginal();
 		id = setTimeout(unGlitch, 1000);
 	}
@@ -895,6 +756,16 @@ var Portrait = (function() {
 	function stop() {
 		clearTimeout(id);
 	}
+
+	function adjust() { 
+		rX = canvas2.width/1.8;
+		rY = canvas2.height/3;
+		buffer.width = canvas2.width;
+		buffer.height = canvas2.height;
+	}
+
+	/****/
+
 
 
 
@@ -905,26 +776,20 @@ var Portrait = (function() {
 	}
 
 
+
 	//creates a coloring function w/ an added filter
 	//optional: applyColor2 is executed for pixels that don't pass the filter
 	function _getColoringF(filter, applyColor, applyColor2) {
 		var f;
 
 		if (applyColor2) {
-			f = function(d, i) {
-				if (filter(d, i)) {
-					applyColor(d, i);
-				}	
-				else {
-					applyColor2(d, i);
-				}
+			f = function(d, i) { 
+				(filter(d, i)) ? applyColor(d, i) : applyColor2(d,i);	
 			}
 		}
 		else {
-			f = function(d, i) {
-				if (filter(d, i)) {
-					applyColor(d, i);
-				}	
+			f = function(d, i) { 
+				(filter(d, i)) && applyColor(d, i);	
 			}
 		}
 
@@ -933,10 +798,7 @@ var Portrait = (function() {
 
 	//create function that executes a frame of glitch
 	function _getGlitch(divider, coloringF, render) {
-		return divider.bind(this, 
-							coloringF, 
-							render);
-
+		return divider.bind(null, coloringF, render);
 	}
 
 	
@@ -954,10 +816,10 @@ var Portrait = (function() {
 	}
 
 	function _renderChunk(imgData) {
-		x = _rand(0, w),
-		y = _rand(0, h),
-		w2 = (x > w/2) ? _rand(-1,-x) : _rand(1, w - x),
-		h2 = (y > h/2) ? _rand(-1, -y) : _rand(1, h - y);
+		var x = _rand(0, w),
+			y = _rand(0, h),
+			w2 = (x > w/2) ? _rand(-1,-x) : _rand(1, w - x),
+			h2 = (y > h/2) ? _rand(-1, -y) : _rand(1, h - y);
 
 		ctx2.putImageData(imgData, 
 						  rX, rY,
@@ -971,16 +833,14 @@ var Portrait = (function() {
 		var i, cX;
 
 		for (i = 0 ; i < h ; i+=sInc) {
-
+			//shift right for even blocks, left for odd blocks
 			cX = ( Math.round(i / hInc) % 2 === 0) ? rX + sInc : rX - sInc; 
 
 			bCtx.putImageData(imgData, 
 							  cX, rY,
 							  0, i,
-							  w,
-							  hInc);
+							  w, hInc);
 		}
-
 
 		ctx2.drawImage(buffer, 0, 0);
 	}
@@ -988,77 +848,43 @@ var Portrait = (function() {
 	/*
 	 * filtering functions
 	 */
-	function _isBrighterThan(n) {
-
-		return function(d, i) {
-			return (d[i] + d[i+1] + d[i+2])/3 > n;
-		}
-
+	function _getFilter(f) { 
+		return function(d, i, n) { 
+			return f(d, i, n);
+		}	
 	}
 
-	function _isDarkerThan(n) {
+	var _isBrighterThan = _getFilter(function(d, i, n) { 
+		return (d[i] + d[i+1] + d[i+2])/3 > n;
+	});
 
-		return function(d, i) {
-			return (d[i] + d[i+1] + d[i+2])/3 < n;
-		}
+	var _isDarkerThan = _getFilter(function(d, i, n) { 
+		return (d[i] + d[i+1] + d[i+2])/3 < n;
+	});
 
-	}
+	var _isRedderThan = _getFilter(function(d, i, n) { 
+		return d[i] > n;
+	});
 
-	function _isRedderThan(n)  {
+	var _isLessRedThan = _getFilter(function(d, i, n) { 
+		return d[i] < n;
+	})
 
-		return function(d, i) {
-			return d[i] > n;
-		}
-
-	}
-
-	function _isLessRedThan(n) {
-		
-		return function(d, i) {
-			return d[i] < n;
-		}
-
-	}
-
-	function _isGreenerThan(n)  {
-
-		return function(d, i) {
+	var _isGreenerThan = _getFilter(function(d, i, n) { 
 			return d[i+1] > n;
-		}
+		});
 
-	}
-
-	function _isLessGreenThan(n) {
-		
-		return function(d, i) {
+	var _isLessGreenThan = _getFilter(function(d, i, n) { 
 			return d[i+1] < n;
-		}
+		});
 
-	}
-
-	function _isBluerThan(n)  {
-
-		return function(d, i) {
+	var _isBluerThan = _getFilter(function(d, i, n) { 
 			return d[i+2] > n;
-		}
+		});
 
-	}
-
-	function _isLessBlueThan(n) {
-		
-		return function(d, i) {
+	var _isLessBlueThan = _getFilter(function(d, i, n) { 
 			return d[i+2] < n;
-		}
-
-	}
-
-	function _randHigherThan(n) {
-		
-		return function() {
-			return Math.random() > n;
-		}
-
-	}
+		});
 
 	/*
 	 * coloring functions
@@ -1077,10 +903,8 @@ var Portrait = (function() {
 		d[i+2] = 255 - d[i+2];
 	}
 
-	function _alpha(a) {
-		return function(d, i) {
-			d[i + 3] = a;
-		}
+	function _alpha(d, i, a) {
+		d[i + 3] = a;
 	}
 
 	function _standardDark(d, i) {
@@ -1129,6 +953,8 @@ var Portrait = (function() {
 	//divides the pixels in some type of way, applies colors  and renders 
 	
 	function _all(coloringF, render) {
+		var i;
+
 		for (i = 0 ; i < leng ; i+=4 ) {
 			coloringF(d, i);
 		}
@@ -1136,9 +962,102 @@ var Portrait = (function() {
 		render(imgData);
 	}
 
-	//
+	/****/
+
 	function _rand(lo, hi) {
 		return Math.round( Math.random() * (hi - lo)  + lo );
+	}
+
+	/**
+	 * setup glitch  
+	 */
+
+		var id,
+		//time
+		t = 0,
+		time = 0;
+
+
+		var filter = function(d, i) {
+			var result = false;
+
+			(time % 5 === 0) && (result = _isDarkerThan(d, i, _rand(50, 200)) );
+			(time % 5 === 1) && (result = _isRedderThan(d, i, _rand(100, 200)) );
+			(time % 5 === 2) && (result = _isLessRedThan(d, i, _rand(100, 200)) );
+			(time % 5 === 3) && (result = _isLessBlueThan(d, i, _rand(100, 200)) );
+			(time % 5 === 4) && (result = _isBrighterThan(d, i, _rand(100, 200)) );
+
+			return result;
+		}
+
+		var color1 = function(d, i) {
+			var r = _rand(20, 80);
+
+			(Math.random() > 0.8) ? _alpha(d, i, r) : (_invert(d, i), _alpha(d, i, r));
+		}
+		
+		var colorF = _getColoringF(filter, 
+								color1,
+								 _standardDark);
+
+		var render = function(d) {
+			bCtx.fillStyle = "rgba(16, 16, 32, 0.5)"; 
+			bCtx.fillRect(rX - 5, 
+							rY - 5, 
+							hidden.width * 1.1, 
+							hidden.height * 1.1);
+
+			if (Math.random() > 0.7) {
+				_renderChunk(d);
+			}
+			else {
+				_renderShifted(d, h/_rand(10, 50), _rand(1, 5));
+			}
+
+			_resetData(d);
+
+			if (time === t*6) {
+				color = colors[  Math.round( Math.random()*(colors.length - 1) ) ];
+			}
+
+			time = (time + t) % 7*t;
+		}
+
+		var glitch = _getGlitch(_all, colorF, render);
+
+		var runGlitch = function() {
+			var r = Math.random();
+
+			glitch();
+			id = (r > 0.1) ? setTimeout(runGlitch, t) : setTimeout(unGlitch, t);
+		}
+
+		var unGlitch = function() {
+			var r = Math.random();
+
+			ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+			_renderOriginal();
+
+			if (r > 0.8) {
+				time = 0;
+				t = _rand(30, 150);
+
+				id = setTimeout(runGlitch, t);
+			}
+			else {
+				id = setTimeout(unGlitch, 300);
+			}
+		} 
+
+	/**
+	 *
+	 */
+
+	return {
+		init: init,
+		stop: stop,
+		adjust: adjust
 	}
 })();
 
@@ -1149,10 +1068,12 @@ var WorkBlob = (function() {
 //var originX = canvas2.width/2,
 	//originY = canvas2.height/2,
 
-var originX = canvas2.width/1.8,
+//var originX = canvas2.width/1.8,
+var originX = canvas2.width/1.75,
 	originY = canvas2.height/2,
 
 	//original radius
+	//origR = 120,
 	origR = 120,
 	//changing radius
 	r = origR,
@@ -1178,16 +1099,16 @@ var originX = canvas2.width/1.8,
 				  'rgba(255, 255, 80, 0.5)',
 				  'rgba(130, 130, 255, 0.5)',
 				  'rgba(255, 150, 30, 0.5)'],
-			  
+			 
+	//color index
 	i = 0;
 
-	ctx2.fillStyle = colors[i];
 
 
 	//to update display
 	var prevSelected, newSelected;
 	
-	function _updateColor() {
+	function _updateColorIndex() {
 		var j = Math.round( Math.random() * (colors.length - 1) );
 
 		while (j === i) {
@@ -1195,17 +1116,14 @@ var originX = canvas2.width/1.8,
 		}
 
 		i = j;
-		ctx2.fillStyle = colors[i];
 	}
 
 
 	function draw() {
-		//where in the period period
+		//where in the period 
 		var p = (Math.cos(angle)+1)/2;
 
-		ctx2.clearRect(0, 0,
-				canvas2.width, canvas2.height);
-		
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
 		ctx2.beginPath();
 		ctx2.moveTo(left, start);
@@ -1282,6 +1200,8 @@ var originX = canvas2.width/1.8,
 							);
 
 		ctx2.closePath();
+		ctx2.fillStyle = colors[i];
+
 		ctx2.fill();
 	}
 
@@ -1303,7 +1223,7 @@ var originX = canvas2.width/1.8,
 			newSelected.className += ' project-selected';
 
 
-			_updateColor();
+			_updateColorIndex();
 			draw();
 
 			angle -= Math.PI/40 % (Math.PI*2);
@@ -1330,7 +1250,7 @@ var originX = canvas2.width/1.8,
 			newSelected.className += ' project-selected';
 
 
-			_updateColor();
+			_updateColorIndex();
 			draw();
 
 			angle += Math.PI/40 % (Math.PI*2);
@@ -1388,9 +1308,22 @@ var originX = canvas2.width/1.8,
 		raf(fill);
 	}
 
+	function adjust() { 
+		originX = canvas2.width/1.75;
+		originY = canvas2.height/2;
+		left = originX - origR*2;
+		right = originX + origR*2;
+		start = originY - 250;
+		end = originY + 300;
+		incr = (end - start);
+
+		((/work/).test(window.location.hash)) && draw();
+	}
+
 	return {
 		fadeIn: fadeIn,
-		flexDisplay: flexDisplay
+		flexDisplay: flexDisplay,
+		adjust: adjust
 	}
 })();
 
@@ -1433,7 +1366,8 @@ Disco.add('ball', {
 		}
 
 		var init4 = function() {
-			el.addClass('disco-init4')
+			//el.addClass('disco-init4')
+			el.attr('class', 'disco-solid disco-init4')
 		}
 
 		//second visit and on gets partial disco treatment
@@ -1456,27 +1390,19 @@ Disco.add('browsers', {
 
 	id: undefined,
 
-	//do we stil need this???
-	//rendered: false,
-
 	browsers: [],	
 
 	init: function(data) {
-			this.browsers.push(new Browser(data.ie.pts, data.ie.colors));
-			this.browsers.push(new Browser(data.firefox.pts, data.firefox.colors));
-			this.browsers.push(new Browser(data.chrome.pts, data.chrome.colors));
-			this.browsers.push(new Browser(data.opera.pts, data.opera.colors));
+			this.browsers.push(Browser(data.ie.pts, data.ie.colors));
+			this.browsers.push(Browser(data.firefox.pts, data.firefox.colors));
+			this.browsers.push(Browser(data.chrome.pts, data.chrome.colors));
+			this.browsers.push(Browser(data.opera.pts, data.opera.colors));
 	},
 
 	render: function() {
 		this.browsers[ this.i ].blowUp();
 		this.id = setInterval(this._toggle.bind(this),
 							  30000)
-
-		//do we stil need this???
-		setTimeout(function() {
-			this.rendered = true;
-		}.bind(this), 1000)
 	},
 
 	explode: function() {
@@ -1495,15 +1421,6 @@ Disco.add('browsers', {
 							  30000)
 	},
 
-	//do we still need this?
-	renderExplode: function() {
-		this.browsers[ this.i ].blowUp();
-
-		setTimeout(function() {
-			this.browsers[ this.i ].explode();
-		}.bind(this), 800)
-	},
-
 	_shrink: function() {
 		var browsers = this.browsers,
 			i = this.i;
@@ -1520,11 +1437,7 @@ Disco.add('browsers', {
 
 		//delay increment so that explode
 		//doesn't conlict with shrink
-		setTimeout(function() {
-
-			this._increment();
-
-		}.bind(this), 1000)
+		setTimeout(this._increment.bind(this), 1000)
 
 	},
 })
@@ -1592,16 +1505,11 @@ Disco.add('nav', {
 	menuHidden: false,
 
 	render: function() {
-		var that = this.el;
+		var nav = this.el;
 
-		setTimeout(function() {
-			that.attr("class", "nav-loading");	
+		nav.attr("class", "nav-loading");	
 
-			//too much to have it load every time we go back to the menu
-			setTimeout(function() {
-				that.attr('class', '');
-			}, 500);
-		}, 0)
+		setTimeout(nav.attr.bind(nav, 'class', ''), 500);
 	},
 
 	showBackBtn: function() {
@@ -1641,6 +1549,7 @@ Disco.add('nav', {
 			else {
 				//enlarge selected link text
 				setTimeout(function() {
+					back.attr('class', '');
 
 					//select link
 					this.setAttribute('class', 'link-selected');
@@ -1686,56 +1595,97 @@ Disco.add('nav', {
 
 });
 
-Disco.add('suk', {
+Disco.add('resumeDisplay', {
+	$el: $('#resume-display'),
 
-	el: $('#suk'),			
+	tools: [ 
+			 ['vim', 'github'],
+			 ['javascript', 'html5', 'css3', 'sass'],
+			 ['angular', 'react', 'backbone', 'jquery', 'responsive design',
+			  'node', 'mongo', 'bootstrap', 'foundation',
+			  'svg', 'php'],
+			['photoshop', 'illustrator', 'indesign'],
+			['korea', 'japan']
+	],
 
-	states: {},
+	populate: function() {
+		this.tools.forEach(appendToolSet);
 
-	render: function() {
-
-		this.states = {
-			"sleepy": sprites.getSprite("sleepy"),	
-			"hover": sprites.getSprite("hover"),	
-			"social": sprites.getSprite("social"),	
-			"whoa": sprites.getSprite("whoa"),	
-			"professional": sprites.getSprite("professional")	
+		function appendToolSet(toolset, i) { 
+			var $ul = $('.resume-display-' + i + ' ul'); 	
+			toolset.forEach(appendTool, $ul);
 		}
 
-		this.setState("sleepy");	
 
-		this.el.removeClass('suk-hidden');
+		function appendTool(tool) { 
+			var $li = $("<li></li>"),						   
+				 $a = $("<a class='sprite' target='_blank'" +
+						"title='more about " + tool + "'" +  
+						"></a>");
+
+			sprites.applyImgToEl(tool, $a);
+			$li.append($a);
+			this.append($li);
+		}
+	}, 
+
+	render: function() {
+		this.populate();
+	},
+
+	init: function() {
+		var $display = this.$el;
+
+		$display.attr('class', 'display-selected');
+		$display.addClass('resume-init');
+
+		setTimeout(function() {
+			$display.removeClass('resume-init');	
+			$display.addClass('resume-loaded');	
+		}, 2000)
+	},
+
+})
+
+Disco.add('suk', {
+	$el: $('#suk'),			
+
+	render: function() {
+		//unhide suk
+		this.setState("sleepy");	
+		this.$el.removeClass('suk-hidden');
 	},
 
 	setState: function(state) {
-		var d = this.states[state];					 
-
-		this.el.css({ 'background-position': d.x + 'px ' + d.y + 'px',
-					  'width': d.width,
-					  'height': d.height });
+		sprites.applyImgToEl(state, this.$el);	
 	}
 
 });
 
 Disco.add('workDisplay', {
 
-	container: $('#display'),
+	$container: $('#display'),
 
-	el: undefined,
-
-	init: WorkBlob.fadeIn,
+	$el: undefined,
 
 	render: function() {
-		this.el = $(templates.getTemplate('work_display'));
+		this.$el = $(templates.getTemplate('work_display'));
 			
-		this.container.append(this.el);
-	}
-	
+		this.$container.append(this.$el);
+	},
+
+	init: function() {
+		this.$el.attr('class', 'display-selected');
+
+		WorkBlob.fadeIn('wordpress-0');
+	} 
 })
 
 Disco.add('workMenu', {
 
 	container: $('#content'),
+
+	content: undefined,
 
 	el: undefined,
 
@@ -1746,10 +1696,20 @@ Disco.add('workMenu', {
 	},
 
 	render: function() {
-
 		this.el = $(templates.getTemplate('work_menu'));
-
 		this.container.append(this.el);
+
+		this.content = $('#work');
+	},
+
+	init: function() {
+		
+		 if (this.selected) {
+		 	this.selected.className = 'project'; 
+			this.selected = undefined;
+		 }
+
+		 this.content.addClass('content-selected');
 	},
 
 	display: function(e) {
@@ -1777,8 +1737,8 @@ Disco.add('workMenu', {
 Disco.router({
 	//home
 	'': function(e) {
-		var content = $('.content-selected'),
-			display = $('.display-selected');
+		var $content = $('.content-selected'),
+			$display = $('.display-selected');
 
 		Disco.get('nav').showLinks();
 		Disco.get('suk').setState("sleepy");
@@ -1786,105 +1746,63 @@ Disco.router({
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
-		if (e) {
-			if (e.oldURL.search(/about/) > -1) {
-				Portrait.stop();	
-			}
-		}
+		//stop portrait if returning from about
+		(e && e.oldURL.search(/about/) > -1) && Portrait.stop();
 
 		//hide content and display of previous page
-		if (content) {
-			content.attr('class', '');
-		}
+		(typeof $content !== "undefined") && $content.attr('class', '');
+		(typeof $display !== "undefined") && $display.attr('class', '');
 
-		if (display) {
-			display.attr('class', '');
-		}
-
-		setTimeout(function() {
-			Disco.get('browsers').render();
-		}, 100)
+		setTimeout(Disco.get('browsers').render, 300);
 	},
 
 	'about': function() {
-		var nav = Disco.get('nav'), 
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#about']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#about']")[0] );
+		document.getElementById('about')
+				 .className = 'content-selected';
 
-
-		content = document.getElementById('about');
-
-		content.className = 'content-selected';
-
-		setTimeout(function() {
-			nav.back.attr('class', '');
-
+		setTimeout(function start() {
 			Disco.get('suk').setState("whoa");
 			Disco.get('browsers').explode();
 			Portrait.init();
-
 		}, 400);
 	},
 
 	'resume': function() {
-		var nav = Disco.get('nav'), 
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#resume']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#resume']")[0] );
-
-
-		content = document.getElementById('resume');
-		display = document.getElementById('resume-display');
-
-		content.className = 'content-selected';
+		document.getElementById('resume')
+				 .className = 'content-selected';
 
 		setTimeout(function() {
-			nav.back.attr('class', '');
-
 			Disco.get('suk').setState("professional");
 			Disco.get('browsers').explode();
 
-			display.className = 'display-selected';
+			Disco.get('resumeDisplay').init();
 		}, 400);
 	},
 
 	'work': function() {
-		var nav = Disco.get('nav'), 
-			selected = Disco.get('workMenu').selected,
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#work']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#work']")[0] );
-
-
-		content = document.getElementById('work');
-		display = document.getElementById('work-display');
-
-		if (selected) {
-			selected.className = "project";
-			Disco.get('workMenu').selected = undefined;
-		}
-
-		content.className = 'content-selected';
+		Disco.get('workMenu').init();
 
 		setTimeout(function() {
-			nav.back.attr('class', '');
 
 			Disco.get('suk').setState("professional");
 			Disco.get('browsers').explode();
 
-			display.className = 'display-selected';
-
-			Disco.get('workDisplay').init('wordpress-0');
+			Disco.get('workDisplay').init();
 		}, 400);
 
 	}
 }, 
 
-function() {
+function windowEvents() {
 	var browsers = Disco.get('browsers');	
 
 	if (!sessionStorage.getItem('visited')) {
@@ -1895,23 +1813,35 @@ function() {
 	//need to pause display when on a different tab
 	//otherwise it gets messed up
 	window.addEventListener('blur', function() {
-		if (window.location.hash.length === 0) {
-			browsers.pause();
-		}
+		window.location.hash.length === 0 &&
+		browsers.pause();
 	})
 
 	window.addEventListener('focus', function() {
-		if (window.location.hash.length === 0) {
-			browsers.cont(); 
-		}
+		window.location.hash.length === 0 &&
+		browsers.cont();
+	})
+
+	/*
+	 * PUT WINDOW RESIZE RESPONSIVE STUFF HERE
+	 *
+	 */
+	window.addEventListener('resize', function() { 
+		canvas.width = canvas2.width = window.innerWidth;
+		canvas.height = canvas2.height = window.innerHeight;
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+		Portrait.adjust();
+		WorkBlob.adjust();
 	})
 })
 
 var loadInterface = function() {
-	var times;
+	var delays;
 
 	if (sessionStorage.getItem('visited')) {
-		times = [0,
+		delays = [0,
+				 0,
 				 0,
 				 0,
 				 0,
@@ -1919,7 +1849,8 @@ var loadInterface = function() {
 				 0];
 	}
 	else {
-		times = [0,
+		delays = [0,
+				 0,
 				 0,
 				 0,
 				 2200,
@@ -1929,12 +1860,13 @@ var loadInterface = function() {
 
 	Disco.render(['workMenu',
 				  'workDisplay',
+				  'resumeDisplay',
 				  'ball',
 				  'suk',
 				  'nav', 
 				  'contact'],
 
-				  times);
+				  delays);
 }
 
 var startDisco = function() {

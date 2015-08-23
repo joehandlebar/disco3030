@@ -5,10 +5,12 @@ var WorkBlob = (function() {
 //var originX = canvas2.width/2,
 	//originY = canvas2.height/2,
 
-var originX = canvas2.width/1.8,
+//var originX = canvas2.width/1.8,
+var originX = canvas2.width/1.75,
 	originY = canvas2.height/2,
 
 	//original radius
+	//origR = 120,
 	origR = 120,
 	//changing radius
 	r = origR,
@@ -34,16 +36,16 @@ var originX = canvas2.width/1.8,
 				  'rgba(255, 255, 80, 0.5)',
 				  'rgba(130, 130, 255, 0.5)',
 				  'rgba(255, 150, 30, 0.5)'],
-			  
+			 
+	//color index
 	i = 0;
 
-	ctx2.fillStyle = colors[i];
 
 
 	//to update display
 	var prevSelected, newSelected;
 	
-	function _updateColor() {
+	function _updateColorIndex() {
 		var j = Math.round( Math.random() * (colors.length - 1) );
 
 		while (j === i) {
@@ -51,17 +53,14 @@ var originX = canvas2.width/1.8,
 		}
 
 		i = j;
-		ctx2.fillStyle = colors[i];
 	}
 
 
 	function draw() {
-		//where in the period period
+		//where in the period 
 		var p = (Math.cos(angle)+1)/2;
 
-		ctx2.clearRect(0, 0,
-				canvas2.width, canvas2.height);
-		
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
 		ctx2.beginPath();
 		ctx2.moveTo(left, start);
@@ -138,6 +137,8 @@ var originX = canvas2.width/1.8,
 							);
 
 		ctx2.closePath();
+		ctx2.fillStyle = colors[i];
+
 		ctx2.fill();
 	}
 
@@ -159,7 +160,7 @@ var originX = canvas2.width/1.8,
 			newSelected.className += ' project-selected';
 
 
-			_updateColor();
+			_updateColorIndex();
 			draw();
 
 			angle -= Math.PI/40 % (Math.PI*2);
@@ -186,7 +187,7 @@ var originX = canvas2.width/1.8,
 			newSelected.className += ' project-selected';
 
 
-			_updateColor();
+			_updateColorIndex();
 			draw();
 
 			angle += Math.PI/40 % (Math.PI*2);
@@ -244,8 +245,21 @@ var originX = canvas2.width/1.8,
 		raf(fill);
 	}
 
+	function adjust() { 
+		originX = canvas2.width/1.75;
+		originY = canvas2.height/2;
+		left = originX - origR*2;
+		right = originX + origR*2;
+		start = originY - 250;
+		end = originY + 300;
+		incr = (end - start);
+
+		((/work/).test(window.location.hash)) && draw();
+	}
+
 	return {
 		fadeIn: fadeIn,
-		flexDisplay: flexDisplay
+		flexDisplay: flexDisplay,
+		adjust: adjust
 	}
 })();

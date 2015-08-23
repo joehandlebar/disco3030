@@ -2,6 +2,8 @@ Disco.add('workMenu', {
 
 	container: $('#content'),
 
+	content: undefined,
+
 	el: undefined,
 
 	selected: undefined,
@@ -11,10 +13,20 @@ Disco.add('workMenu', {
 	},
 
 	render: function() {
-
 		this.el = $(templates.getTemplate('work_menu'));
-
 		this.container.append(this.el);
+
+		this.content = $('#work');
+	},
+
+	init: function() {
+		
+		 if (this.selected) {
+		 	this.selected.className = 'project'; 
+			this.selected = undefined;
+		 }
+
+		 this.content.addClass('content-selected');
 	},
 
 	display: function(e) {

@@ -1,8 +1,8 @@
 Disco.router({
 	//home
 	'': function(e) {
-		var content = $('.content-selected'),
-			display = $('.display-selected');
+		var $content = $('.content-selected'),
+			$display = $('.display-selected');
 
 		Disco.get('nav').showLinks();
 		Disco.get('suk').setState("sleepy");
@@ -10,105 +10,63 @@ Disco.router({
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
-		if (e) {
-			if (e.oldURL.search(/about/) > -1) {
-				Portrait.stop();	
-			}
-		}
+		//stop portrait if returning from about
+		(e && e.oldURL.search(/about/) > -1) && Portrait.stop();
 
 		//hide content and display of previous page
-		if (content) {
-			content.attr('class', '');
-		}
+		(typeof $content !== "undefined") && $content.attr('class', '');
+		(typeof $display !== "undefined") && $display.attr('class', '');
 
-		if (display) {
-			display.attr('class', '');
-		}
-
-		setTimeout(function() {
-			Disco.get('browsers').render();
-		}, 100)
+		setTimeout(Disco.get('browsers').render, 300);
 	},
 
 	'about': function() {
-		var nav = Disco.get('nav'), 
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#about']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#about']")[0] );
+		document.getElementById('about')
+				 .className = 'content-selected';
 
-
-		content = document.getElementById('about');
-
-		content.className = 'content-selected';
-
-		setTimeout(function() {
-			nav.back.attr('class', '');
-
+		setTimeout(function start() {
 			Disco.get('suk').setState("whoa");
 			Disco.get('browsers').explode();
 			Portrait.init();
-
 		}, 400);
 	},
 
 	'resume': function() {
-		var nav = Disco.get('nav'), 
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#resume']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#resume']")[0] );
-
-
-		content = document.getElementById('resume');
-		display = document.getElementById('resume-display');
-
-		content.className = 'content-selected';
+		document.getElementById('resume')
+				 .className = 'content-selected';
 
 		setTimeout(function() {
-			nav.back.attr('class', '');
-
 			Disco.get('suk').setState("professional");
 			Disco.get('browsers').explode();
 
-			display.className = 'display-selected';
+			Disco.get('resumeDisplay').init();
 		}, 400);
 	},
 
 	'work': function() {
-		var nav = Disco.get('nav'), 
-			selected = Disco.get('workMenu').selected,
-			content, display;
+		Disco.get('nav')
+			  .hideLinksExcept( $("a[href='#work']")[0] );
 
-		
-		nav.hideLinksExcept( $("a[href='#work']")[0] );
-
-
-		content = document.getElementById('work');
-		display = document.getElementById('work-display');
-
-		if (selected) {
-			selected.className = "project";
-			Disco.get('workMenu').selected = undefined;
-		}
-
-		content.className = 'content-selected';
+		Disco.get('workMenu').init();
 
 		setTimeout(function() {
-			nav.back.attr('class', '');
 
 			Disco.get('suk').setState("professional");
 			Disco.get('browsers').explode();
 
-			display.className = 'display-selected';
-
-			Disco.get('workDisplay').init('wordpress-0');
+			Disco.get('workDisplay').init();
 		}, 400);
 
 	}
 }, 
 
-function() {
+function windowEvents() {
 	var browsers = Disco.get('browsers');	
 
 	if (!sessionStorage.getItem('visited')) {
@@ -119,14 +77,25 @@ function() {
 	//need to pause display when on a different tab
 	//otherwise it gets messed up
 	window.addEventListener('blur', function() {
-		if (window.location.hash.length === 0) {
-			browsers.pause();
-		}
+		window.location.hash.length === 0 &&
+		browsers.pause();
 	})
 
 	window.addEventListener('focus', function() {
-		if (window.location.hash.length === 0) {
-			browsers.cont(); 
-		}
+		window.location.hash.length === 0 &&
+		browsers.cont();
+	})
+
+	/*
+	 * PUT WINDOW RESIZE RESPONSIVE STUFF HERE
+	 *
+	 */
+	window.addEventListener('resize', function() { 
+		canvas.width = canvas2.width = window.innerWidth;
+		canvas.height = canvas2.height = window.innerHeight;
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+		Portrait.adjust();
+		WorkBlob.adjust();
 	})
 })

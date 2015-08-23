@@ -19,11 +19,21 @@
 		margin-top: 0.3em;
 		margin-bottom: 0;
 		font-style: italic;
+		font-weight: 400;
 	}
 
 	&-content {
 		margin-top: 0.8em;		
 		margin-bottom: 0;
+	}
+
+	&-subheading a,
+	&-content a { 
+		text-decoration: underline;
+
+		&:hover { 
+			color: $yellow;	
+		}
 	}
 }
 

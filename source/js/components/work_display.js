@@ -1,15 +1,18 @@
 Disco.add('workDisplay', {
 
-	container: $('#display'),
+	$container: $('#display'),
 
-	el: undefined,
-
-	init: WorkBlob.fadeIn,
+	$el: undefined,
 
 	render: function() {
-		this.el = $(templates.getTemplate('work_display'));
+		this.$el = $(templates.getTemplate('work_display'));
 			
-		this.container.append(this.el);
-	}
-	
+		this.$container.append(this.$el);
+	},
+
+	init: function() {
+		this.$el.attr('class', 'display-selected');
+
+		WorkBlob.fadeIn('wordpress-0');
+	} 
 })

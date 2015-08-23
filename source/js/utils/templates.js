@@ -3,62 +3,51 @@ var templates = (function() {
 								  	 html: ''},
 					  'work_display':  { type: 'html',
 								  	     html: ''}
-					},
-		tmp;
+					};
+
+	return {
+		loadTemplates: loadTemplates,
+		compileTemplates: compileTemplates,
+		getTemplate: getTemplate
+	}
 
 
 	//takes a promise to fulfill once templates are loaded
 	function loadTemplates(promise) {
-		var leng = Object.keys(_templates).length, i = 0;
+		var leng = Object.keys(_templates).length, 
+			i = 0, 
+			tmp;
 
 		for (tmp in _templates) {
-			(function(tmp){
-				$.get('view/' + tmp + '.' + _templates[tmp].type, 
-					function(data) {
-						_templates[tmp].html = data;
+			_loadTemplate(tmp);
 
-						i++;
-
-						if (i === leng) {
-							promise.fulfill();
-						}
-					})
-			}(tmp))
 		}
+
+		function _loadTemplate(tmp) { 
+			var tmpObj = _templates[tmp],
+				path = 'view/' + tmp + '.' + tmpObj.type;
+
+			$.get(path, storeTemplate);
+
+			function storeTemplate(data) { 
+				tmpObj.html = data;
+
+				i++;
+				//all templates loaded? 
+				(i === leng) && promise.fulfill();
+			}
+		}
+
 	}
 
 	//compiles templates with given data
 	function compileTemplates(data) {
 		var menuTmp = Handlebars.compile(_templates['work_menu'].html),
-			displayTmp = Handlebars.compile(_templates['work_display'].html);
+			displayTmp = Handlebars.compile(_templates['work_display'].html, { noEscape: true });
 
 		//inject sprite data 
-		var sp;
-		data.apps.forEach(function(app) {
-			app.img = sprites.getSprite(app.img); 
-
-			app.tools = app.tools.map(function(tool) {
-				sp = sprites.getSprite(tool.toLowerCase());
-
-				//we shouldnt need this eventually
-				sp["name"] = tool;
-
-				return sp;	
-			})
-		});
-
-		data.wordpress.forEach(function(w) {
-			w.img = sprites.getSprite(w.img); 
-			
-			w.tools = w.tools.map(function(tool) {
-				sp = sprites.getSprite(tool.toLowerCase());
-
-				//we shouldnt need this eventually
-				sp["name"] = tool;
-
-				return sp;	
-			})
-		});
+		data.apps.forEach(_injectSpriteData);
+		data.wordpress.forEach(_injectSpriteData);
 
 		_templates['work_menu'].html = menuTmp({ 
 											apps: data.apps, 
@@ -71,14 +60,19 @@ var templates = (function() {
 											   }); 
 	}
 
-
 	function getTemplate(t) {
 		return _templates[t].html;
 	}
 
-	return {
-		loadTemplates: loadTemplates,
-		compileTemplates: compileTemplates,
-		getTemplate: getTemplate
+	/****/
+
+	function _injectSpriteData(project) { 
+		project.img = sprites.getSprite(project.img);
+
+		project.tools = project.tools.map(_getToolsSpriteData);
 	}
+
+	function _getToolsSpriteData(name) { 
+		return sprites.getSprite(name.toLowerCase());
+	} 
 })();

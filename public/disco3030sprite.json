@@ -15,7 +15,16 @@
         "width": 40,
         "height": 40
     },
+    "vim": {
+		"href": "http://www.vim.org/",
+        "name": "vim",
+        "x": 275,
+        "y": 80,
+        "width": 40,
+        "height": 40
+    },
     "responsive": {
+		"href": "http://alistapart.com/article/responsive-web-design",
         "name": "responsive",
         "x": 63,
         "y": 291,
@@ -38,11 +47,27 @@
         "width": 40,
         "height": 40
     },
+    "korea": {
+		"href": "https://en.wikipedia.org/wiki/Korea",
+        "name": "korea",
+        "x": 234,
+        "y": 71,
+        "width": 40,
+        "height": 40
+    },
     "svg": {
         "name": "svg",
         "href": "https://developer.mozilla.org/en/docs/Web/SVG",
         "x": 63,
         "y": 250,
+        "width": 40,
+        "height": 40
+    },
+    "responsive design": {
+        "name": "responsive design",
+		"href": "http://alistapart.com/article/responsive-web-design",
+        "x": 63,
+        "y": 373,
         "width": 40,
         "height": 40
     },
@@ -80,7 +105,7 @@
     },
     "github": {
         "name": "github",
-        "href": "https://github.com/",
+        "href": "https://github.com/joehandlebar",
         "x": 111,
         "y": 162,
         "width": 40,
@@ -157,10 +182,19 @@
         "height": 149
     },
     "javascript": {
+		"href": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
         "name": "javascript",
         "x": 152,
         "y": 121,
         "width": 40,
+        "height": 40
+    },
+    "japan": {
+		"href": "https://en.wikipedia.org/wiki/Japan",
+        "name": "japan",
+        "x": 148,
+        "y": 71,
+        "width": 50,
         "height": 40
     },
     "photoshop": {
@@ -177,6 +211,14 @@
         "width": 40,
         "height": 40
     },
+    "backbone": {
+		"href": "http://backbonejs.org/",
+        "name": "backbone",
+        "x": 70,
+        "y": 80,
+        "width": 40,
+        "height": 40
+    },
     "indesign": {
         "name": "indesign",
         "x": 234,
@@ -184,7 +226,8 @@
         "width": 40,
         "height": 40
     },
-    "boostrap": {
+    "bootstrap": {
+		"href": "http://getbootstrap.com/",
         "name": "boostrap",
         "x": 193,
         "y": 162,
@@ -192,6 +235,7 @@
         "height": 40
     },
     "foundation": {
+		"href": "http://foundation.zurb.com/",
         "name": "foundation",
         "x": 152,
         "y": 162,

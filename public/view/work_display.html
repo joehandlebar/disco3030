@@ -15,9 +15,15 @@
 				{{/each}}
 				</li>
 			</ul>
+			<div class='project-links'>
+				<a href="{{github}}" 
+					target="_blank" 
+					title="{{menuTitle}} github page"
+					class="project-github"><i class='fa fa-github-alt'></i></a>
 			<a target="_blank" class="project-href" href="{{href}}">
 				<span class="project-href-hover-1">See it</span><span class="project-href-hover-2">L</span><span class="project-href-hover-3">i</span><span class="project-href-hover-4">v</span><span class="project-href-hover-5">e !</span>
 			</a>
+			</div>
 			<div class="sprite project-img" style="background-position: {{img.x}}px {{img.y}}px; width: {{img.width}}px; height: {{img.height}}px"></div>
 		</article>
 	{{/each}}
@@ -37,9 +43,11 @@
 				{{/each}}
 				</li>
 			</ul>
+			<div class="project-links">
 			<a target="_blank" class="project-href" href="{{href}}">
 				<span class="project-href-hover-1">See it</span><span class="project-href-hover-2">L</span><span class="project-href-hover-3">i</span><span class="project-href-hover-4">v</span><span class="project-href-hover-5">e !</span>
 			</a>
+			</div>
 			<div class="sprite project-img" style="background-position: {{img.x}}px {{img.y}}px; width: {{img.width}}px; height: {{img.height}}px"></div>
 		</article>
 	{{/each}}
